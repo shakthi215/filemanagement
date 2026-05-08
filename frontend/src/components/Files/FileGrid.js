@@ -6,7 +6,7 @@ import Modal from '../UI/Modal';
 import FilePreview from './FilePreview';
 import styles from './FileGrid.module.css';
 
-function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview }) {
+function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview, onDownload }) {
   const [showMenu, setShowMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const meta = getFileMeta(file.type);
@@ -43,9 +43,9 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview 
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           )}
-          <a className={styles.actionBtn} href={file.url} target="_blank" rel="noopener noreferrer" download={file.name} title="Download">
+          <button className={styles.actionBtn} onClick={() => onDownload(file)} title="Download">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </a>
+          </button>
           <button className={styles.actionBtn} onClick={() => onRename(file)} title="Rename">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
@@ -59,7 +59,7 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview 
             <div className={styles.ctxOverlay} onClick={() => setShowMenu(false)} />
             <ContextMenu x={menuPos.x} y={menuPos.y} file={file} meta={meta}
               onClose={() => setShowMenu(false)} onDelete={onDelete} onRename={onRename}
-              onToggleStar={onToggleStar} onPreview={onPreview} />
+              onToggleStar={onToggleStar} onPreview={onPreview} onDownload={onDownload} />
           </>
         )}
       </div>
@@ -103,14 +103,14 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview 
           <div className={styles.ctxOverlay} onClick={() => setShowMenu(false)} />
           <ContextMenu x={menuPos.x} y={menuPos.y} file={file} meta={meta}
             onClose={() => setShowMenu(false)} onDelete={onDelete} onRename={onRename}
-            onToggleStar={onToggleStar} onPreview={onPreview} />
+            onToggleStar={onToggleStar} onPreview={onPreview} onDownload={onDownload} />
         </>
       )}
     </div>
   );
 }
 
-function ContextMenu({ x, y, file, meta, onClose, onDelete, onRename, onToggleStar, onPreview }) {
+function ContextMenu({ x, y, file, meta, onClose, onDelete, onRename, onToggleStar, onPreview, onDownload }) {
   return (
     <div className={styles.contextMenu} style={{ top: y, left: x }}>
       {isPreviewable(file) && (
@@ -119,10 +119,10 @@ function ContextMenu({ x, y, file, meta, onClose, onDelete, onRename, onToggleSt
           Preview
         </button>
       )}
-      <a href={file.url} target="_blank" rel="noopener noreferrer" download={file.name} onClick={onClose}>
+      <button onClick={() => { onDownload(file); onClose(); }}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download
-      </a>
+      </button>
       <button onClick={() => { onToggleStar(file._id); onClose(); }}>
         <span style={{ fontSize: '0.9rem' }}>★</span>
         {file.isStarred ? 'Unstar' : 'Star'}
@@ -141,7 +141,7 @@ function ContextMenu({ x, y, file, meta, onClose, onDelete, onRename, onToggleSt
 }
 
 export default function FileGrid() {
-  const { files, viewMode, filterType, sortBy, searchQuery, loadFiles, currentFolderId, deleteFile, renameFile, toggleStar } = useFileManager();
+  const { files, viewMode, filterType, sortBy, searchQuery, loadFiles, currentFolderId, deleteFile, renameFile, toggleStar, downloadFile } = useFileManager();
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [renaming, setRenaming] = useState(null);
   const [newName, setNewName] = useState('');
@@ -187,7 +187,7 @@ export default function FileGrid() {
             {files.map(file => (
               <FileCard key={file._id} file={file} viewMode="grid"
                 onDelete={handleDelete} onRename={handleRename}
-                onToggleStar={toggleStar} onPreview={setPreview} />
+                onToggleStar={toggleStar} onPreview={setPreview} onDownload={downloadFile} />
             ))}
           </div>
         ) : (
@@ -198,7 +198,7 @@ export default function FileGrid() {
             {files.map(file => (
               <FileCard key={file._id} file={file} viewMode="list"
                 onDelete={handleDelete} onRename={handleRename}
-                onToggleStar={toggleStar} onPreview={setPreview} />
+                onToggleStar={toggleStar} onPreview={setPreview} onDownload={downloadFile} />
             ))}
           </div>
         )}

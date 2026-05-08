@@ -4,7 +4,7 @@ const { protect } = require('../middleware/auth');
 const { upload } = require('../middleware/upload');
 const {
   uploadFile, getFiles, getAllFiles, deleteFile,
-  previewFile, renameFile, moveFile, toggleStar, getStats
+  previewFile, downloadFile, renameFile, moveFile, toggleStar, getStats
 } = require('../controllers/fileController');
 
 router.use(protect);
@@ -13,6 +13,7 @@ router.get('/stats', getStats);
 router.get('/', getAllFiles);
 router.post('/upload', upload.single('file'), uploadFile);
 router.get('/:id/preview', previewFile);
+router.get('/:id/download', downloadFile);
 router.get('/:folderId', getFiles);
 router.put('/:id', renameFile);
 router.put('/:id/move', moveFile);

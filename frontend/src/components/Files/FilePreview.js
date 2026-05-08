@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useFileManager } from '../../context/FileManagerContext';
 import { getFileMeta, formatSize, formatDate } from '../../utils/fileUtils';
 import { fileAPI } from '../../services/api';
 import styles from './FilePreview.module.css';
@@ -12,6 +13,7 @@ const getInlineUrl = (file) => {
 };
 
 export default function FilePreview({ file, onClose }) {
+  const { downloadFile } = useFileManager();
   const [pdfUrl, setPdfUrl] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState('');
@@ -74,12 +76,12 @@ export default function FilePreview({ file, onClose }) {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <a className={styles.downloadBtn} href={file.url} target="_blank" rel="noopener noreferrer" download={file.name}>
+            <button className={styles.downloadBtn} onClick={() => downloadFile(file)}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
               Download
-            </a>
+            </button>
             {file.type === 'pdf' && (
               <a className={styles.openBtn} href={previewUrl} target="_blank" rel="noopener noreferrer">
                 Open

@@ -297,6 +297,31 @@ const previewFile = async (req, res) => {
   }
 };
 
+// @desc    Download file with original name and type
+// @route   GET /api/files/:id/download
+// @access  Private
+const downloadFile = async (req, res) => {
+  try {
+    const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+
+    if (!file) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    const { buffer, contentType } = await fetchRemoteBuffer(file.url);
+    const filename = file.name || file.originalName || `download.${file.extension || 'file'}`;
+
+    res.setHeader('Content-Type', file.mimeType || contentType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    res.send(buffer);
+  } catch (error) {
+    console.error('Download error:', error);
+    res.status(500).json({ message: 'Error downloading file' });
+  }
+};
+
 // @desc    Rename file
 // @route   PUT /api/files/:id
 // @access  Private
@@ -388,4 +413,4 @@ const getStats = async (req, res) => {
   }
 };
 
-module.exports = { uploadFile, getFiles, getAllFiles, deleteFile, previewFile, renameFile, moveFile, toggleStar, getStats };
+module.exports = { uploadFile, getFiles, getAllFiles, deleteFile, previewFile, downloadFile, renameFile, moveFile, toggleStar, getStats };

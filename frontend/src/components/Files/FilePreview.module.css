@@ -81,6 +81,10 @@
   text-decoration: none;
   transition: all 0.2s;
 }
+
+.downloadBtn {
+  border: 1px solid rgba(124,106,247,0.3);
+}
 .downloadBtn:hover,
 .openBtn:hover {
   background: var(--accent);

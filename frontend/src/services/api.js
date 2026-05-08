@@ -62,6 +62,7 @@ export const fileAPI = {
   move: (id, data) => api.put(`/files/${id}/move`, data),
   toggleStar: (id) => api.put(`/files/${id}/star`),
   preview: (id) => api.get(`/files/${id}/preview`, { responseType: 'blob' }),
+  download: (id) => api.get(`/files/${id}/download`, { responseType: 'blob' }),
   getStats: () => api.get('/files/stats'),
 };
 

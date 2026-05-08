@@ -173,6 +173,23 @@ export const FileManagerProvider = ({ children }) => {
     setFiles(prev => prev.map(f => f._id === fileId ? res.data.file : f));
   }, []);
 
+  const downloadFile = useCallback(async (file) => {
+    try {
+      const res = await fileAPI.download(file._id);
+      const blob = new Blob([res.data], { type: file.mimeType || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name || file.originalName || 'download';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Download failed');
+    }
+  }, []);
+
   return (
     <FileManagerContext.Provider value={{
       currentFolderId, folders, files, allFolders, breadcrumb, activeView,
@@ -181,7 +198,7 @@ export const FileManagerProvider = ({ children }) => {
       setSearchQuery, setFilterType, setSortBy, setViewMode,
       navigateTo, showStarred, showRecent, refresh, loadFolders, loadFiles, loadAllFolders, loadStats,
       createFolder, deleteFolder, renameFolder,
-      uploadFile, deleteFile, renameFile, toggleStar,
+      uploadFile, deleteFile, renameFile, toggleStar, downloadFile,
     }}>
       {children}
     </FileManagerContext.Provider>
