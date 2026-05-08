@@ -4,6 +4,8 @@ const Folder = require('../models/Folder');
 const User = require('../models/User');
 const { getFileType, getFileExtension, getCloudinaryResourceType } = require('../middleware/upload');
 const streamifier = require('streamifier');
+const http = require('http');
+const https = require('https');
 
 const STORAGE_LIMIT_BYTES = 50 * 1024 * 1024 * 1024; // 50GB limit
 
@@ -218,6 +220,49 @@ const deleteFile = async (req, res) => {
   }
 };
 
+// @desc    Stream PDF for inline preview
+// @route   GET /api/files/:id/preview
+// @access  Private
+const previewFile = async (req, res) => {
+  try {
+    const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+
+    if (!file) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    if (file.type !== 'pdf') {
+      return res.status(400).json({ message: 'Preview is only available for PDFs' });
+    }
+
+    const sourceUrl = file.url.includes('/upload/')
+      ? file.url.replace('/upload/', '/upload/fl_inline/')
+      : file.url;
+    const client = sourceUrl.startsWith('https') ? https : http;
+
+    client.get(sourceUrl, (cloudinaryRes) => {
+      if (cloudinaryRes.statusCode >= 300 && cloudinaryRes.statusCode < 400 && cloudinaryRes.headers.location) {
+        return res.redirect(cloudinaryRes.headers.location);
+      }
+
+      if (cloudinaryRes.statusCode !== 200) {
+        return res.status(502).json({ message: 'Unable to load PDF preview' });
+      }
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.name)}"`);
+      res.setHeader('Cache-Control', 'private, max-age=300');
+      cloudinaryRes.pipe(res);
+    }).on('error', (error) => {
+      console.error('PDF preview error:', error);
+      res.status(500).json({ message: 'Error loading PDF preview' });
+    });
+  } catch (error) {
+    console.error('PDF preview error:', error);
+    res.status(500).json({ message: 'Error loading PDF preview' });
+  }
+};
+
 // @desc    Rename file
 // @route   PUT /api/files/:id
 // @access  Private
@@ -309,4 +354,4 @@ const getStats = async (req, res) => {
   }
 };
 
-module.exports = { uploadFile, getFiles, getAllFiles, deleteFile, renameFile, moveFile, toggleStar, getStats };
+module.exports = { uploadFile, getFiles, getAllFiles, deleteFile, previewFile, renameFile, moveFile, toggleStar, getStats };

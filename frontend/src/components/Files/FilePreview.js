@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getFileMeta, formatSize, formatDate } from '../../utils/fileUtils';
+import { fileAPI } from '../../services/api';
 import styles from './FilePreview.module.css';
 
 const getInlineUrl = (file) => {
@@ -10,22 +11,56 @@ const getInlineUrl = (file) => {
   return file.url;
 };
 
-const getPdfViewerUrl = (file) => {
-  const inlineUrl = getInlineUrl(file);
-  return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(inlineUrl)}`;
-};
-
 export default function FilePreview({ file, onClose }) {
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState('');
+
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
     if (file) document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [file, onClose]);
 
+  useEffect(() => {
+    let objectUrl = '';
+    let cancelled = false;
+
+    const loadPdf = async () => {
+      if (!file || file.type !== 'pdf') {
+        setPdfUrl('');
+        setPdfError('');
+        setPdfLoading(false);
+        return;
+      }
+
+      setPdfLoading(true);
+      setPdfError('');
+
+      try {
+        const res = await fileAPI.preview(file._id);
+        if (cancelled) return;
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        objectUrl = URL.createObjectURL(blob);
+        setPdfUrl(objectUrl);
+      } catch {
+        if (!cancelled) setPdfError('PDF preview could not be loaded. Use Open or Download.');
+      } finally {
+        if (!cancelled) setPdfLoading(false);
+      }
+    };
+
+    loadPdf();
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [file]);
+
   if (!file) return null;
   const meta = getFileMeta(file.type);
   const previewUrl = getInlineUrl(file);
-  const pdfViewerUrl = file.type === 'pdf' ? getPdfViewerUrl(file) : '';
 
   return (
     <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -64,10 +99,9 @@ export default function FilePreview({ file, onClose }) {
           )}
           {file.type === 'pdf' && (
             <div className={styles.pdfWrap}>
-              <iframe src={pdfViewerUrl} title={file.name} className={styles.previewFrame} />
-              <p className={styles.pdfHint}>
-                If the preview stays blank, use Open. Some Cloudinary accounts force raw PDFs to download.
-              </p>
+              {pdfLoading && <p className={styles.pdfStatus}>Loading PDF preview...</p>}
+              {pdfError && <p className={styles.pdfStatus}>{pdfError}</p>}
+              {pdfUrl && <iframe src={pdfUrl} title={file.name} className={styles.previewFrame} />}
             </div>
           )}
           {file.mimeType === 'text/plain' && (

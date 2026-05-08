@@ -61,6 +61,7 @@ export const fileAPI = {
   rename: (id, data) => api.put(`/files/${id}`, data),
   move: (id, data) => api.put(`/files/${id}/move`, data),
   toggleStar: (id) => api.put(`/files/${id}/star`),
+  preview: (id) => api.get(`/files/${id}/preview`, { responseType: 'blob' }),
   getStats: () => api.get('/files/stats'),
 };
 
