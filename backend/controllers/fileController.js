@@ -20,6 +20,51 @@ const uploadToCloudinary = (buffer, options) => {
   });
 };
 
+const fetchRemoteBuffer = (sourceUrl, redirectsLeft = 5) => {
+  return new Promise((resolve, reject) => {
+    const client = sourceUrl.startsWith('https') ? https : http;
+    const request = client.get(sourceUrl, {
+      headers: {
+        Accept: 'application/pdf,*/*'
+      }
+    }, (remoteRes) => {
+      const { statusCode, headers } = remoteRes;
+
+      if (statusCode >= 300 && statusCode < 400 && headers.location) {
+        remoteRes.resume();
+        if (redirectsLeft <= 0) {
+          reject(new Error('Too many redirects while loading PDF'));
+          return;
+        }
+
+        const redirectUrl = new URL(headers.location, sourceUrl).toString();
+        fetchRemoteBuffer(redirectUrl, redirectsLeft - 1).then(resolve).catch(reject);
+        return;
+      }
+
+      if (statusCode !== 200) {
+        remoteRes.resume();
+        reject(new Error(`Cloudinary returned ${statusCode}`));
+        return;
+      }
+
+      const chunks = [];
+      remoteRes.on('data', (chunk) => chunks.push(chunk));
+      remoteRes.on('end', () => {
+        resolve({
+          buffer: Buffer.concat(chunks),
+          contentType: headers['content-type'] || 'application/pdf'
+        });
+      });
+    });
+
+    request.on('error', reject);
+    request.setTimeout(30000, () => {
+      request.destroy(new Error('PDF preview request timed out'));
+    });
+  });
+};
+
 // @desc    Upload file
 // @route   POST /api/files/upload
 // @access  Private
@@ -235,28 +280,17 @@ const previewFile = async (req, res) => {
       return res.status(400).json({ message: 'Preview is only available for PDFs' });
     }
 
-    const sourceUrl = file.url.includes('/upload/')
-      ? file.url.replace('/upload/', '/upload/fl_inline/')
-      : file.url;
-    const client = sourceUrl.startsWith('https') ? https : http;
+    const { buffer, contentType } = await fetchRemoteBuffer(file.url);
 
-    client.get(sourceUrl, (cloudinaryRes) => {
-      if (cloudinaryRes.statusCode >= 300 && cloudinaryRes.statusCode < 400 && cloudinaryRes.headers.location) {
-        return res.redirect(cloudinaryRes.headers.location);
-      }
+    if (!contentType.includes('pdf') && !buffer.subarray(0, 4).equals(Buffer.from('%PDF'))) {
+      return res.status(502).json({ message: 'Cloudinary did not return a PDF' });
+    }
 
-      if (cloudinaryRes.statusCode !== 200) {
-        return res.status(502).json({ message: 'Unable to load PDF preview' });
-      }
-
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.name)}"`);
-      res.setHeader('Cache-Control', 'private, max-age=300');
-      cloudinaryRes.pipe(res);
-    }).on('error', (error) => {
-      console.error('PDF preview error:', error);
-      res.status(500).json({ message: 'Error loading PDF preview' });
-    });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`);
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    res.send(buffer);
   } catch (error) {
     console.error('PDF preview error:', error);
     res.status(500).json({ message: 'Error loading PDF preview' });
