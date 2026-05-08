@@ -63,6 +63,7 @@ const getFileExtension = (mimetype, originalname) => {
 
 const getCloudinaryResourceType = (mimetype) => {
   if (mimetype.startsWith('image/')) return 'image';
+  if (mimetype === 'application/pdf') return 'image';
   if (mimetype.startsWith('video/')) return 'video';
   return 'raw';
 };

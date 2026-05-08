@@ -64,7 +64,8 @@
   flex-shrink: 0;
 }
 
-.downloadBtn {
+.downloadBtn,
+.openBtn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -80,10 +81,15 @@
   text-decoration: none;
   transition: all 0.2s;
 }
-.downloadBtn:hover {
+.downloadBtn:hover,
+.openBtn:hover {
   background: var(--accent);
   color: #fff;
   border-color: transparent;
+}
+
+.openBtn {
+  padding: 7px 12px;
 }
 
 .closeBtn {
@@ -123,6 +129,20 @@
   background: #fff;
 }
 
+.pdfWrap {
+  width: 100%;
+  height: 100%;
+}
+
+.pdfHint {
+  padding: 8px 12px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-align: center;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+}
+
 .textPreview {
   width: 100%;
   height: 100%;
@@ -149,7 +169,8 @@
     max-width: 48vw;
   }
 
-  .downloadBtn {
+  .downloadBtn,
+  .openBtn {
     padding: 7px 10px;
     font-size: 0.78rem;
   }
@@ -171,6 +192,10 @@
     justify-content: center;
     font-size: 0;
     gap: 0;
+  }
+
+  .openBtn {
+    height: 34px;
   }
 
   .fileName {
