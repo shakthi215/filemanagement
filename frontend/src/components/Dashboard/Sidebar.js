@@ -4,6 +4,8 @@ import { useFileManager } from '../../context/FileManagerContext';
 import { formatSize, storagePercent } from '../../utils/fileUtils';
 import styles from './Sidebar.module.css';
 
+const STORAGE_LIMIT_BYTES = 50 * 1024 * 1024 * 1024;
+
 const FolderTree = ({ folders, allFolders, currentFolderId, onNavigate, level = 0 }) => {
   const [expanded, setExpanded] = useState({});
 
@@ -61,8 +63,9 @@ export default function Sidebar({ onUploadClick }) {
 
   const rootFolders = allFolders.filter(f => !f.parentFolderId);
   const storageUsed = stats?.storageUsed || user?.storageUsed || 0;
-  const storageLimit = stats?.storageLimit || 5 * 1024 * 1024 * 1024;
+  const storageLimit = stats?.storageLimit || STORAGE_LIMIT_BYTES;
   const pct = storagePercent(storageUsed, storageLimit);
+  const barPct = storageUsed > 0 ? Math.max(pct, 1) : 0;
 
   const navItems = [
     { icon: '⊞', label: 'All Files', view: 'folder', action: () => navigateTo(null) },
@@ -127,7 +130,7 @@ export default function Sidebar({ onUploadClick }) {
           <span className={styles.storageValue}>{pct}%</span>
         </div>
         <div className={styles.storageBar}>
-          <div className={styles.storageFill} style={{ width: `${pct}%` }} />
+          <div className={styles.storageFill} style={{ width: `${barPct}%` }} />
         </div>
         <p className={styles.storageText}>
           {formatSize(storageUsed)} of {formatSize(storageLimit)} used

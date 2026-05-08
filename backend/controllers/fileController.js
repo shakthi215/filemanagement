@@ -5,6 +5,8 @@ const User = require('../models/User');
 const { getFileType, getFileExtension, getCloudinaryResourceType } = require('../middleware/upload');
 const streamifier = require('streamifier');
 
+const STORAGE_LIMIT_BYTES = 50 * 1024 * 1024 * 1024; // 50GB limit
+
 // Upload buffer to Cloudinary
 const uploadToCloudinary = (buffer, options) => {
   return new Promise((resolve, reject) => {
@@ -300,7 +302,7 @@ const getStats = async (req, res) => {
       stats,
       totalFiles,
       storageUsed: user.storageUsed,
-      storageLimit: 5 * 1024 * 1024 * 1024 // 5GB limit
+      storageLimit: STORAGE_LIMIT_BYTES
     });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching stats' });

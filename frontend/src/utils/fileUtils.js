@@ -55,7 +55,10 @@ export const getFileMeta = (type) => FILE_TYPE_META[type] || FILE_TYPE_META.othe
 // Storage percentage
 export const storagePercent = (used, limit) => {
   if (!limit) return 0;
-  return Math.min(100, Math.round((used / limit) * 100));
+  const percent = (used / limit) * 100;
+  if (percent > 0 && percent < 0.1) return Number(percent.toFixed(2));
+  if (percent > 0 && percent < 1) return Number(percent.toFixed(1));
+  return Math.min(100, Math.round(percent));
 };
 
 // Check if file is previewable
