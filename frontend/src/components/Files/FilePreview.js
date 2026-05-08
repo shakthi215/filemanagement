@@ -2,6 +2,14 @@ import React, { useEffect } from 'react';
 import { getFileMeta, formatSize, formatDate } from '../../utils/fileUtils';
 import styles from './FilePreview.module.css';
 
+const getInlineUrl = (file) => {
+  if (!file?.url) return '';
+  if (file.type === 'pdf' && file.url.includes('/upload/')) {
+    return file.url.replace('/upload/', '/upload/fl_inline/');
+  }
+  return file.url;
+};
+
 export default function FilePreview({ file, onClose }) {
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -11,6 +19,7 @@ export default function FilePreview({ file, onClose }) {
 
   if (!file) return null;
   const meta = getFileMeta(file.type);
+  const previewUrl = getInlineUrl(file);
 
   return (
     <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -40,14 +49,14 @@ export default function FilePreview({ file, onClose }) {
 
         <div className={styles.content}>
           {file.type === 'image' && (
-            <img src={file.url} alt={file.name} className={styles.previewImage} />
+            <img src={previewUrl} alt={file.name} className={styles.previewImage} />
           )}
           {file.type === 'pdf' && (
-            <iframe src={file.url} title={file.name} className={styles.previewFrame} />
+            <iframe src={previewUrl} title={file.name} className={styles.previewFrame} />
           )}
           {file.mimeType === 'text/plain' && (
             <div className={styles.textPreview}>
-              <iframe src={file.url} title={file.name} className={styles.previewFrame} />
+              <iframe src={previewUrl} title={file.name} className={styles.previewFrame} />
             </div>
           )}
         </div>

@@ -31,7 +31,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -50,6 +50,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 
 .thumbImg {
@@ -295,6 +296,7 @@
   min-width: 160px;
   box-shadow: var(--shadow-lg);
   animation: scaleIn 0.15s ease;
+  max-width: calc(100vw - 24px);
 }
 
 .contextMenu button, .contextMenu a {
@@ -355,3 +357,31 @@
 .cancelBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
 .confirmBtn { padding: 8px 18px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: #fff; font-family: var(--font); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .confirmBtn:hover { background: var(--accent-hover); }
+
+@media (max-width: 900px) {
+  .section { padding: 14px 16px 20px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .listHeader { display: none; }
+  .listContainer { border: none; overflow: visible; }
+  .listRow {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    gap: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+  }
+  .listIcon { grid-column: 1; }
+  .listName { grid-column: 2; }
+  .listType, .listSize, .listDate { display: none; }
+  .listActions { grid-column: 3; }
+}
+
+@media (max-width: 520px) {
+  .section { padding: 12px; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .cardThumb { height: 150px; }
+  .cardMenu { opacity: 1; }
+  .cardMeta { align-items: flex-start; gap: 6px; flex-direction: column; }
+  .listRow { padding: 10px; }
+  .actionBtn { padding: 4px; }
+}

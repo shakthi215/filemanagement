@@ -127,3 +127,53 @@
   width: 100%;
   height: 100%;
 }
+
+@media (max-width: 700px) {
+  .overlay {
+    padding: 10px;
+    align-items: stretch;
+  }
+
+  .modal {
+    max-height: calc(100vh - 20px);
+    border-radius: var(--radius);
+  }
+
+  .header {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .fileName {
+    max-width: 48vw;
+  }
+
+  .downloadBtn {
+    padding: 7px 10px;
+    font-size: 0.78rem;
+  }
+
+  .content {
+    min-height: 420px;
+  }
+
+  .previewFrame {
+    height: calc(100vh - 120px);
+  }
+}
+
+@media (max-width: 430px) {
+  .downloadBtn {
+    width: 36px;
+    height: 34px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+    gap: 0;
+  }
+
+  .fileName {
+    max-width: 52vw;
+  }
+}

@@ -17,6 +17,7 @@ export const FileManagerProvider = ({ children }) => {
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
+  const [activeView, setActiveView] = useState('folder');
   const [stats, setStats] = useState(null);
 
   const loadFolders = useCallback(async (parentId) => {
@@ -35,14 +36,21 @@ export const FileManagerProvider = ({ children }) => {
     } catch {}
   }, []);
 
-  const loadFiles = useCallback(async (folderId, params) => {
+  const loadFiles = useCallback(async (folderId, params = {}, view = activeView) => {
     try {
-      const res = await fileAPI.getByFolder(folderId, params);
+      let res;
+      if (view === 'starred') {
+        res = await fileAPI.getAll({ ...params, starred: true });
+      } else if (view === 'recent') {
+        res = await fileAPI.getAll({ ...params, sort: params.sort || 'newest' });
+      } else {
+        res = await fileAPI.getByFolder(folderId, params);
+      }
       setFiles(res.data.files);
     } catch {
       toast.error('Failed to load files');
     }
-  }, []);
+  }, [activeView]);
 
   const loadBreadcrumb = useCallback(async (folderId) => {
     if (!folderId) { setBreadcrumb([]); return; }
@@ -61,26 +69,47 @@ export const FileManagerProvider = ({ children }) => {
 
   const navigateTo = useCallback(async (folderId) => {
     setLoading(true);
+    setActiveView('folder');
     setCurrentFolderId(folderId);
     setSearchQuery('');
     await Promise.all([
       loadFolders(folderId),
-      loadFiles(folderId, { sort: sortBy, type: filterType }),
+      loadFiles(folderId, { sort: sortBy, type: filterType }, 'folder'),
       loadBreadcrumb(folderId),
     ]);
     setLoading(false);
   }, [loadFolders, loadFiles, loadBreadcrumb, sortBy, filterType]);
 
+  const showStarred = useCallback(async () => {
+    setLoading(true);
+    setActiveView('starred');
+    setCurrentFolderId(null);
+    setBreadcrumb([]);
+    setFolders([]);
+    await loadFiles(null, { search: searchQuery, type: filterType, sort: sortBy }, 'starred');
+    setLoading(false);
+  }, [loadFiles, searchQuery, filterType, sortBy]);
+
+  const showRecent = useCallback(async () => {
+    setLoading(true);
+    setActiveView('recent');
+    setCurrentFolderId(null);
+    setBreadcrumb([]);
+    setFolders([]);
+    await loadFiles(null, { search: searchQuery, type: filterType, sort: sortBy }, 'recent');
+    setLoading(false);
+  }, [loadFiles, searchQuery, filterType, sortBy]);
+
   const refresh = useCallback(async () => {
     setLoading(true);
     await Promise.all([
-      loadFolders(currentFolderId),
-      loadFiles(currentFolderId, { search: searchQuery, type: filterType, sort: sortBy }),
+      activeView === 'folder' ? loadFolders(currentFolderId) : Promise.resolve(setFolders([])),
+      loadFiles(currentFolderId, { search: searchQuery, type: filterType, sort: sortBy }, activeView),
       loadAllFolders(),
       loadStats(),
     ]);
     setLoading(false);
-  }, [currentFolderId, loadFolders, loadFiles, loadAllFolders, loadStats, searchQuery, filterType, sortBy]);
+  }, [currentFolderId, loadFolders, loadFiles, loadAllFolders, loadStats, searchQuery, filterType, sortBy, activeView]);
 
   const createFolder = useCallback(async (name, color) => {
     const res = await folderAPI.create({ name, parentFolderId: currentFolderId, color });
@@ -146,11 +175,11 @@ export const FileManagerProvider = ({ children }) => {
 
   return (
     <FileManagerContext.Provider value={{
-      currentFolderId, folders, files, allFolders, breadcrumb,
+      currentFolderId, folders, files, allFolders, breadcrumb, activeView,
       loading, uploading, uploadProgress, searchQuery, filterType,
       sortBy, viewMode, stats,
       setSearchQuery, setFilterType, setSortBy, setViewMode,
-      navigateTo, refresh, loadAllFolders, loadStats,
+      navigateTo, showStarred, showRecent, refresh, loadFolders, loadFiles, loadAllFolders, loadStats,
       createFolder, deleteFolder, renameFolder,
       uploadFile, deleteFile, renameFile, toggleStar,
     }}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -38,6 +38,10 @@ const AppRoutes = () => (
 );
 
 export default function App() {
+  useEffect(() => {
+    document.documentElement.dataset.theme = localStorage.getItem('bizfiles_theme') || 'light';
+  }, []);
+
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -49,7 +53,7 @@ export default function App() {
           newestOnTop
           closeOnClick
           pauseOnHover
-          theme="dark"
+          theme="light"
         />
       </AuthProvider>
     </BrowserRouter>

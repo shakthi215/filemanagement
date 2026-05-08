@@ -4,8 +4,6 @@ import { useFileManager } from '../../context/FileManagerContext';
 import { formatSize, storagePercent } from '../../utils/fileUtils';
 import styles from './Sidebar.module.css';
 
-const FOLDER_COLORS = ['#6366f1','#3b82f6','#06b6d4','#22c55e','#f59e0b','#ef4444','#ec4899'];
-
 const FolderTree = ({ folders, allFolders, currentFolderId, onNavigate, level = 0 }) => {
   const [expanded, setExpanded] = useState({});
 
@@ -54,7 +52,7 @@ const FolderTree = ({ folders, allFolders, currentFolderId, onNavigate, level = 
 
 export default function Sidebar({ onUploadClick }) {
   const { user, logout } = useAuth();
-  const { currentFolderId, allFolders, stats, navigateTo, loadAllFolders, loadStats } = useFileManager();
+  const { currentFolderId, activeView, allFolders, stats, navigateTo, showStarred, showRecent, loadAllFolders, loadStats } = useFileManager();
 
   useEffect(() => {
     loadAllFolders();
@@ -67,9 +65,9 @@ export default function Sidebar({ onUploadClick }) {
   const pct = storagePercent(storageUsed, storageLimit);
 
   const navItems = [
-    { icon: '⊞', label: 'All Files', action: () => navigateTo(null) },
-    { icon: '★', label: 'Starred', action: () => {} },
-    { icon: '🕐', label: 'Recent', action: () => navigateTo(null) },
+    { icon: '⊞', label: 'All Files', view: 'folder', action: () => navigateTo(null) },
+    { icon: '★', label: 'Starred', view: 'starred', action: showStarred },
+    { icon: '🕐', label: 'Recent', view: 'recent', action: showRecent },
   ];
 
   return (
@@ -96,7 +94,7 @@ export default function Sidebar({ onUploadClick }) {
         {navItems.map(item => (
           <button
             key={item.label}
-            className={`${styles.navItem} ${!currentFolderId && item.label === 'All Files' ? styles.navActive : ''}`}
+            className={`${styles.navItem} ${activeView === item.view && (!currentFolderId || item.view !== 'folder') ? styles.navActive : ''}`}
             onClick={item.action}
           >
             <span className={styles.navIcon}>{item.icon}</span>

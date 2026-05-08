@@ -7,6 +7,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('bizfiles_token');
+    localStorage.removeItem('bizfiles_user');
+    setUser(null);
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('bizfiles_token');
     const savedUser = localStorage.getItem('bizfiles_user');
@@ -15,7 +21,11 @@ export const AuthProvider = ({ children }) => {
       // Verify token is still valid
       authAPI.getMe()
         .then(res => setUser(res.data.user))
-        .catch(() => logout())
+        .catch(() => {
+          localStorage.removeItem('bizfiles_token');
+          localStorage.removeItem('bizfiles_user');
+          setUser(null);
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -36,12 +46,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('bizfiles_user', JSON.stringify(res.data.user));
     setUser(res.data.user);
     return res.data;
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('bizfiles_token');
-    localStorage.removeItem('bizfiles_user');
-    setUser(null);
   }, []);
 
   const updateUser = useCallback((updates) => {

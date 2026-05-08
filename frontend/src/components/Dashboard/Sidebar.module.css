@@ -264,3 +264,64 @@
   color: var(--error);
   background: rgba(239,68,68,0.1);
 }
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    max-height: none;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .logoArea {
+    padding: 14px 16px 10px;
+  }
+
+  .uploadBtn {
+    margin: 10px 16px;
+  }
+
+  .nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 16px;
+  }
+
+  .nav .sectionLabel {
+    display: none;
+  }
+
+  .navItem {
+    width: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .foldersSection {
+    flex: none;
+    max-height: 180px;
+    padding: 0 16px 8px;
+  }
+
+  .storageSection {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .logoText {
+    font-size: 1rem;
+  }
+
+  .uploadBtn {
+    width: calc(100% - 32px);
+  }
+
+  .userArea {
+    padding: 10px 16px;
+  }
+}

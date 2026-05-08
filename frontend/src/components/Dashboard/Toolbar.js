@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFileManager } from '../../context/FileManagerContext';
 import styles from './Toolbar.module.css';
 
@@ -25,7 +25,12 @@ const SORT_OPTIONS = [
 
 export default function Toolbar({ onNewFolder, onUpload, title, subtitle }) {
   const { searchQuery, setSearchQuery, filterType, setFilterType, sortBy, setSortBy, viewMode, setViewMode, refresh } = useFileManager();
-  const [searching, setSearching] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('bizfiles_theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('bizfiles_theme', theme);
+  }, [theme]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -39,6 +44,22 @@ export default function Toolbar({ onNewFolder, onUpload, title, subtitle }) {
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </div>
         <div className={styles.actions}>
+          <button
+            className={styles.iconBtn}
+            onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {theme === 'dark' ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z" />
+              </svg>
+            )}
+          </button>
           <button className={styles.iconBtn} onClick={refresh} title="Refresh">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <polyline points="23 4 23 10 17 10" />

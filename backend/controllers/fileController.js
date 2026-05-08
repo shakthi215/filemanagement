@@ -1,5 +1,6 @@
 const cloudinary = require('../config/cloudinary');
 const File = require('../models/File');
+const Folder = require('../models/Folder');
 const User = require('../models/User');
 const { getFileType, getFileExtension, getCloudinaryResourceType } = require('../middleware/upload');
 const streamifier = require('streamifier');
@@ -26,6 +27,13 @@ const uploadFile = async (req, res) => {
 
     const { folderId } = req.body;
     const { buffer, originalname, mimetype, size } = req.file;
+
+    if (folderId) {
+      const folder = await Folder.findOne({ _id: folderId, userId: req.user._id });
+      if (!folder) {
+        return res.status(404).json({ message: 'Folder not found' });
+      }
+    }
 
     const fileType = getFileType(mimetype);
     const extension = getFileExtension(mimetype, originalname);
@@ -93,7 +101,7 @@ const uploadFile = async (req, res) => {
 const getFiles = async (req, res) => {
   try {
     const { folderId } = req.params;
-    const { search, type, sort = 'newest' } = req.query;
+    const { search, type, sort = 'newest', starred } = req.query;
 
     const query = { userId: req.user._id };
     
@@ -109,6 +117,10 @@ const getFiles = async (req, res) => {
 
     if (type && type !== 'all') {
       query.type = type;
+    }
+
+    if (starred === 'true') {
+      query.isStarred = true;
     }
 
     // Sort options
@@ -136,7 +148,7 @@ const getFiles = async (req, res) => {
 // @access  Private
 const getAllFiles = async (req, res) => {
   try {
-    const { search, type, sort = 'newest' } = req.query;
+    const { search, type, sort = 'newest', starred } = req.query;
 
     const query = { userId: req.user._id };
 
@@ -148,6 +160,10 @@ const getAllFiles = async (req, res) => {
       query.type = type;
     }
 
+    if (starred === 'true') {
+      query.isStarred = true;
+    }
+
     let sortOption = {};
     switch (sort) {
       case 'newest': sortOption = { createdAt: -1 }; break;
@@ -155,6 +171,7 @@ const getAllFiles = async (req, res) => {
       case 'name_asc': sortOption = { name: 1 }; break;
       case 'name_desc': sortOption = { name: -1 }; break;
       case 'size_desc': sortOption = { size: -1 }; break;
+      case 'size_asc': sortOption = { size: 1 }; break;
       default: sortOption = { createdAt: -1 };
     }
 
@@ -227,6 +244,11 @@ const moveFile = async (req, res) => {
     const { folderId } = req.body;
     const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
     if (!file) return res.status(404).json({ message: 'File not found' });
+
+    if (folderId) {
+      const folder = await Folder.findOne({ _id: folderId, userId: req.user._id });
+      if (!folder) return res.status(404).json({ message: 'Destination folder not found' });
+    }
 
     file.folderId = folderId || null;
     await file.save();

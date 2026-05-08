@@ -13,20 +13,28 @@ import styles from './DashboardPage.module.css';
 export default function DashboardPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [newFolderOpen, setNewFolderOpen] = useState(false);
-  const { navigateTo, loading, currentFolderId, breadcrumb } = useFileManager();
+  const { navigateTo, loading, currentFolderId, breadcrumb, activeView } = useFileManager();
 
   useEffect(() => {
     navigateTo(null);
     // eslint-disable-next-line
   }, []);
 
-  const title = breadcrumb.length > 0
-    ? breadcrumb[breadcrumb.length - 1]?.name
-    : 'My Files';
+  const title = activeView === 'starred'
+    ? 'Starred'
+    : activeView === 'recent'
+      ? 'Recent'
+      : breadcrumb.length > 0
+        ? breadcrumb[breadcrumb.length - 1]?.name
+        : 'My Files';
 
-  const subtitle = currentFolderId
-    ? `${breadcrumb.map(b => b.name).join(' / ')}`
-    : 'All your business files in one place';
+  const subtitle = activeView === 'starred'
+    ? 'Files you marked as important'
+    : activeView === 'recent'
+      ? 'Your newest files across all folders'
+      : currentFolderId
+        ? `${breadcrumb.map(b => b.name).join(' / ')}`
+        : 'All your business files in one place';
 
   return (
     <div className={styles.layout}>

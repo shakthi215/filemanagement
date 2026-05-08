@@ -15,7 +15,10 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview 
   const openMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setMenuPos({ x: e.clientX, y: e.clientY });
+    setMenuPos({
+      x: Math.min(e.clientX, window.innerWidth - 180),
+      y: Math.min(e.clientY, window.innerHeight - 260)
+    });
     setShowMenu(true);
   };
 

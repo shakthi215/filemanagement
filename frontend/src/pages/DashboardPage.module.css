@@ -37,4 +37,8 @@
   .layout {
     flex-direction: column;
   }
+
+  .main {
+    width: 100%;
+  }
 }

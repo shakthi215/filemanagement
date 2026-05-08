@@ -1,5 +1,6 @@
 const Folder = require('../models/Folder');
 const File = require('../models/File');
+const User = require('../models/User');
 
 // @desc    Create folder
 // @route   POST /api/folders/create
@@ -139,6 +140,13 @@ const deleteFolder = async (req, res) => {
       } catch (err) {
         console.error('Cloudinary delete error:', err);
       }
+    }
+
+    const freedStorage = files.reduce((total, file) => total + (file.size || 0), 0);
+    if (freedStorage > 0) {
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { storageUsed: -freedStorage }
+      });
     }
 
     await File.deleteMany({ folderId: { $in: allFolderIds }, userId: req.user._id });
