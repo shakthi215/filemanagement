@@ -1,0 +1,357 @@
+.section { padding: 16px 24px 24px; }
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.count {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+}
+
+/* Grid view */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  animation: fadeIn 0.25s ease;
+}
+.card:hover {
+  border-color: var(--border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardThumb {
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.card:hover .cardOverlay { opacity: 1; }
+
+.previewBtn {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+}
+.previewBtn:hover { background: rgba(255,255,255,0.25); transform: scale(1.1); }
+
+.starBtn {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+}
+.starBtn:hover, .starred { color: #fbbf24 !important; background: rgba(0,0,0,0.7) !important; }
+
+.cardMenu {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.card:hover .cardMenu { opacity: 1; }
+.cardMenu:hover { background: rgba(0,0,0,0.8); color: #fff; }
+
+.cardInfo {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cardName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardType {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.cardSize {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.cardDate {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* List view */
+.listContainer {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.listHeader {
+  display: grid;
+  grid-template-columns: 1fr 100px 80px 110px 140px;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.listRow {
+  display: grid;
+  grid-template-columns: 1fr 100px 80px 110px 140px;
+  gap: 12px;
+  padding: 10px 16px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-card);
+  transition: background 0.15s;
+  position: relative;
+  animation: fadeIn 0.2s ease;
+}
+.listRow:last-child { border-bottom: none; }
+.listRow:hover { background: var(--bg-hover); }
+
+.listIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.listThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listType {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.listSize, .listDate {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.listRow .starBtn {
+  position: static;
+  background: none;
+  width: 26px;
+  height: 26px;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.actionBtn:hover { background: var(--bg-primary); color: var(--text-primary); }
+.deleteBtn:hover { color: var(--error) !important; background: rgba(239,68,68,0.1) !important; }
+
+/* Context menu */
+.ctxOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+.contextMenu {
+  position: fixed;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px;
+  z-index: 300;
+  min-width: 160px;
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.15s ease;
+}
+
+.contextMenu button, .contextMenu a {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.contextMenu button:hover, .contextMenu a:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.ctxDivider { border-top: 1px solid var(--border-light); margin: 4px 0; }
+.dangerItem { color: var(--error) !important; }
+.dangerItem:hover { background: rgba(239,68,68,0.08) !important; }
+
+/* Empty state */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+.emptyIcon { font-size: 3.5rem; margin-bottom: 16px; opacity: 0.5; }
+.emptyTitle { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.emptyMsg { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Rename inputs */
+.renameInput {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.renameInput:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+.renameActions { display: flex; gap: 10px; justify-content: flex-end; }
+.cancelBtn { padding: 8px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-secondary); font-family: var(--font); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.cancelBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.confirmBtn { padding: 8px 18px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: #fff; font-family: var(--font); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.confirmBtn:hover { background: var(--accent-hover); }
