@@ -64,8 +64,7 @@
   flex-shrink: 0;
 }
 
-.downloadBtn,
-.openBtn {
+.downloadBtn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -85,15 +84,10 @@
 .downloadBtn {
   border: 1px solid rgba(124,106,247,0.3);
 }
-.downloadBtn:hover,
-.openBtn:hover {
+.downloadBtn:hover {
   background: var(--accent);
   color: #fff;
   border-color: transparent;
-}
-
-.openBtn {
-  padding: 7px 12px;
 }
 
 .closeBtn {
@@ -172,8 +166,7 @@
     max-width: 48vw;
   }
 
-  .downloadBtn,
-  .openBtn {
+  .downloadBtn {
     padding: 7px 10px;
     font-size: 0.78rem;
   }
@@ -195,10 +188,6 @@
     justify-content: center;
     font-size: 0;
     gap: 0;
-  }
-
-  .openBtn {
-    height: 34px;
   }
 
   .fileName {
