@@ -12,13 +12,33 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview,
   const meta = getFileMeta(file.type);
   const thumb = getThumbnailUrl(file);
 
-  const openMenu = (e) => {
+  const getMenuPosition = (e, anchorToElement = false) => {
+    const menuWidth = 180;
+    const menuHeight = 260;
+    const gap = 8;
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if (anchorToElement && e.currentTarget?.getBoundingClientRect) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      x = rect.right + gap;
+      y = rect.top;
+
+      if (x + menuWidth > window.innerWidth - gap) {
+        x = rect.left - menuWidth - gap;
+      }
+    }
+
+    return {
+      x: Math.max(gap, Math.min(x, window.innerWidth - menuWidth - gap)),
+      y: Math.max(gap, Math.min(y, window.innerHeight - menuHeight - gap))
+    };
+  };
+
+  const openMenu = (e, anchorToElement = false) => {
     e.preventDefault();
     e.stopPropagation();
-    setMenuPos({
-      x: Math.min(e.clientX, window.innerWidth - 180),
-      y: Math.min(e.clientY, window.innerHeight - 260)
-    });
+    setMenuPos(getMenuPosition(e, anchorToElement));
     setShowMenu(true);
   };
 
@@ -92,7 +112,7 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview,
         </div>
         <span className={styles.cardDate}>{formatDate(file.createdAt)}</span>
       </div>
-      <button className={styles.cardMenu} onClick={(e) => { e.stopPropagation(); openMenu(e); }}>
+      <button className={styles.cardMenu} onClick={(e) => openMenu(e, true)}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
         </svg>
