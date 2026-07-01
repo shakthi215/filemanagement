@@ -88,47 +88,42 @@
 .previewBtn:hover { background: rgba(255,255,255,0.25); transform: scale(1.1); }
 
 .starBtn {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  background: rgba(0,0,0,0.5);
+  background: none;
   border: none;
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 0.9rem;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  font-size: 1rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
   padding: 0;
+  flex-shrink: 0;
 }
-.starBtn:hover, .starred { color: #fbbf24 !important; background: rgba(0,0,0,0.7) !important; }
+.starBtn:hover { color: #fbbf24; background: var(--bg-hover); }
+.starred { color: #fbbf24 !important; }
 
 .cardMenu {
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  background: rgba(0,0,0,0.5);
+  background: none;
   border: none;
   cursor: pointer;
   color: var(--text-muted);
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
-.card:hover .cardMenu { opacity: 1; }
-.cardMenu:hover { background: rgba(0,0,0,0.8); color: #fff; }
+.cardMenu:hover { background: var(--bg-hover); color: var(--text-primary); }
 
 .cardInfo {
-  padding: 10px 12px;
+  padding: 10px 12px 8px;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -168,6 +163,15 @@
 .cardDate {
   font-size: 0.7rem;
   color: var(--text-muted);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 6px;
 }
 
 /* List view */

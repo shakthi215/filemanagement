@@ -70,6 +70,12 @@ export const isPreviewable = (file) => {
 export const getThumbnailUrl = (file) => {
   if (file.thumbnail) return file.thumbnail;
   if (file.type === 'image') return file.url;
+  if (file.type === 'pdf' && file.url) {
+    // Derive a page-1 JPG thumbnail from the Cloudinary PDF URL
+    return file.url
+      .replace('/upload/', '/upload/w_300,h_300,c_fill,q_auto,f_jpg,pg_1/')
+      .replace(/\.pdf$/i, '.jpg');
+  }
   return null;
 };
 

@@ -34,7 +34,7 @@ export default function DashboardPage() {
       ? 'Your newest files across all folders'
       : currentFolderId
         ? `${breadcrumb.map(b => b.name).join(' / ')}`
-        : 'All your business files in one place';
+        : 'All your files in one place';
 
   return (
     <div className={styles.layout}>

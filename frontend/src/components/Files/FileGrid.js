@@ -12,33 +12,30 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview,
   const meta = getFileMeta(file.type);
   const thumb = getThumbnailUrl(file);
 
-  const getMenuPosition = (e, anchorToElement = false) => {
-    const menuWidth = 180;
-    const menuHeight = 260;
-    const gap = 8;
-    let x = e.clientX;
-    let y = e.clientY;
-
-    if (anchorToElement && e.currentTarget?.getBoundingClientRect) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      x = rect.right + gap;
-      y = rect.top;
-
-      if (x + menuWidth > window.innerWidth - gap) {
-        x = rect.left - menuWidth - gap;
-      }
-    }
-
-    return {
-      x: Math.max(gap, Math.min(x, window.innerWidth - menuWidth - gap)),
-      y: Math.max(gap, Math.min(y, window.innerHeight - menuHeight - gap))
-    };
-  };
-
-  const openMenu = (e, anchorToElement = false) => {
+  const openMenu = (e, anchorToButton = false) => {
     e.preventDefault();
     e.stopPropagation();
-    setMenuPos(getMenuPosition(e, anchorToElement));
+    const menuWidth = 180;
+    const menuHeight = 220;
+    const gap = 6;
+    let x, y;
+
+    if (anchorToButton && e.currentTarget?.getBoundingClientRect) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      x = rect.left;
+      y = rect.bottom + gap;
+      // flip left if overflows right edge
+      if (x + menuWidth > window.innerWidth - gap) x = rect.right - menuWidth;
+      // flip up if overflows bottom edge
+      if (y + menuHeight > window.innerHeight - gap) y = rect.top - menuHeight - gap;
+    } else {
+      x = e.clientX;
+      y = e.clientY;
+      if (x + menuWidth > window.innerWidth - gap) x = x - menuWidth;
+      if (y + menuHeight > window.innerHeight - gap) y = y - menuHeight;
+    }
+
+    setMenuPos({ x: Math.max(gap, x), y: Math.max(gap, y) });
     setShowMenu(true);
   };
 
@@ -90,8 +87,9 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview,
     <div className={styles.card} onContextMenu={openMenu} onClick={() => isPreviewable(file) && onPreview(file)}>
       <div className={styles.cardThumb} style={{ background: meta.bg }}>
         {thumb
-          ? <img src={thumb} alt={file.name} className={styles.thumbImg} />
-          : <span style={{ fontSize: '2.4rem' }}>{meta.icon}</span>}
+          ? <img src={thumb} alt={file.name} className={styles.thumbImg} onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }} />
+          : null}
+        <span style={{ fontSize: '2.4rem', display: thumb ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>{meta.icon}</span>
         <div className={styles.cardOverlay}>
           {isPreviewable(file) && (
             <button className={styles.previewBtn} onClick={(e) => { e.stopPropagation(); onPreview(file); }}>
@@ -99,10 +97,6 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview,
             </button>
           )}
         </div>
-        <button
-          className={`${styles.starBtn} ${file.isStarred ? styles.starred : ''}`}
-          onClick={(e) => { e.stopPropagation(); onToggleStar(file._id); }}
-        >★</button>
       </div>
       <div className={styles.cardInfo}>
         <span className={styles.cardName}>{file.name}</span>
@@ -110,13 +104,22 @@ function FileCard({ file, viewMode, onDelete, onRename, onToggleStar, onPreview,
           <span className={styles.cardType} style={{ color: meta.color, background: meta.bg }}>{meta.icon} {meta.label}</span>
           <span className={styles.cardSize}>{formatSize(file.size)}</span>
         </div>
-        <span className={styles.cardDate}>{formatDate(file.createdAt)}</span>
+        <div className={styles.cardActions}>
+          <span className={styles.cardDate}>{formatDate(file.createdAt)}</span>
+          <div style={{ display: 'flex', gap: '2px' }}>
+            <button
+              className={`${styles.starBtn} ${file.isStarred ? styles.starred : ''}`}
+              onClick={(e) => { e.stopPropagation(); onToggleStar(file._id); }}
+              title={file.isStarred ? 'Unstar' : 'Star'}
+            >★</button>
+            <button className={styles.cardMenu} onClick={(e) => { e.stopPropagation(); openMenu(e, true); }} title="More options">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-      <button className={styles.cardMenu} onClick={(e) => openMenu(e, true)}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
-        </svg>
-      </button>
 
       {showMenu && (
         <>

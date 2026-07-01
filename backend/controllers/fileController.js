@@ -104,7 +104,7 @@ const uploadFile = async (req, res) => {
     // Upload to Cloudinary
     const result = await uploadToCloudinary(buffer, uploadOptions);
 
-    // Generate thumbnail URL for images
+    // Generate thumbnail URL for images and PDFs
     let thumbnail = null;
     if (resourceType === 'image') {
       thumbnail = cloudinary.url(result.public_id, {
@@ -112,7 +112,8 @@ const uploadFile = async (req, res) => {
         height: 300,
         crop: 'fill',
         quality: 'auto',
-        format: 'webp'
+        format: 'webp',
+        ...(fileType === 'pdf' && { page: 1 })
       });
     }
 
